@@ -11,23 +11,18 @@ public class MyCalendarTester
     public static void main(String [] args)
     {
         // In case execution spans change of day, this calendar shall represent "today" for the rest of execution
-        GregorianCalendar cal = new GregorianCalendar(); // captures today's date
-//        printMonth(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal);
-//        System.out.println();
+        MyCalendar cal = new MyCalendar(); // defaults to today's date
+        cal.set(Calendar.DAY_OF_MONTH, 31);
+        cal.printMonth();
+        System.out.println();
 
-//        printMonth(cal.get(Calendar.YEAR), Calendar.JANUARY, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.FEBRUARY, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.MARCH, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.APRIL, cal);
-//        printMonth(cal.get(Calendar.YEAR), Calendar.MAY, cal);
-//        printMonth(cal.get(Calendar.YEAR), Calendar.JUNE, cal);
-//        printMonth(cal.get(Calendar.YEAR), Calendar.JULY, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.AUGUST, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.SEPTEMBER, cal);
-        printMonth(cal.get(Calendar.YEAR), Calendar.OCTOBER, cal);
-//        printMonth(cal.get(Calendar.YEAR), Calendar.NOVEMBER, cal);
-//        printMonth(cal.get(Calendar.YEAR), Calendar.DECEMBER, cal);
+        cal.add(Calendar.MONTH, 1);
+        cal.printMonth();
+        System.out.println();
 
+        cal.add(Calendar.MONTH, 1);
+        cal.printMonth();
+        System.out.println();
 //        Scanner sc = new Scanner(System.in);
 //        printCalendar(cal);
 ////        "Select one of the following options: \n"
@@ -66,81 +61,7 @@ public class MyCalendarTester
 //            }
 //        }
 //        System.out.println("Bye!");
-
     }
 
-    /**
-     * Print camendar for given year/month, with brackets around specified date
-     * @param year
-     * @param month
-     * @param today Brackets will be placed around the date represented in this Calendar
-     */
-    public static void printMonth(int year, int month, Calendar today){
-        //Note: Throughout, we will add 1 character left pad to make space for today indicator in case it's Sunday
-        int width = 21; // Calendar width in characters -- todo: this includes that extra character - is it off center?
 
-        //Initialize calendar object to 1st of given year/month
-        GregorianCalendar c = new GregorianCalendar();
-        c.set(year, month, 1);
-
-        // -------- Month/Year label --------
-        SimpleDateFormat sdfHeader = new SimpleDateFormat("MMMMM yyyy");
-        String header = sdfHeader.format(c.getTime());                      // Calculate length of Month/Year
-        int headerLength = header.length() + (width - header.length()) / 2; // + half of remaining whitespace
-        System.out.println(" " + String.format("%" + headerLength + "s", header));
-
-        // -------- Weekday labels --------
-        DateFormatSymbols dfs = new DateFormatSymbols();
-        String[] weekdays = dfs.getShortWeekdays();      //List of weekdays
-        System.out.print(" ");  // Add 1 character pad to the left in case of brackets
-        for(int i = 1; i < weekdays.length; i++)  // Note: getShortWeekdays seems to be start at 1 instead of 0
-        {
-            System.out.print(weekdays[i].substring(0,2) + " ");
-        }
-        System.out.println();
-
-        // -------- Day numbers --------
-        int spaces = c.get(Calendar.DAY_OF_WEEK) - 1;  // Print blank spaces up to first day
-        if (spaces > 0)
-            System.out.print(String.format("%" + spaces * 3 + "s", " "));
-
-        // We'll use ints instead of calling c.get over and over
-        int day = 0;
-        int lastDayOfMonth = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-        boolean skipNextSpace = false;
-        while(day + 1 <= lastDayOfMonth){
-            day = c.get(Calendar.DAY_OF_MONTH);  // Current day being printed
-
-            //Space before number
-            if (!skipNextSpace)
-                System.out.print(dateMatches(today, c) ? "[" : " ");
-            else
-                skipNextSpace = false; //Done skipping space; print the next one
-
-            System.out.print(String.format("%2d", day));  //Day number
-
-            if (dateMatches(c, today)){
-                System.out.print("]");
-                skipNextSpace = true;
-            }
-
-            // todo: Unverified assumption.  Does c.getActualMaximum(Calendar.DAY_OF_WEEK) work for calendars with different last day of week?
-            if (c.get(Calendar.DAY_OF_WEEK) == c.getActualMaximum(Calendar.DAY_OF_WEEK)) {
-                //Don't print a newline if we just finished the last day of the month (this prevents duplicate newline when month ends on Saturday)
-                if (day != lastDayOfMonth)
-                    System.out.println();
-                skipNextSpace = false;
-            }
-            //If today then print [ else print space
-
-            c.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        System.out.println();
-    }
-
-    private static boolean dateMatches(Calendar today, Calendar comp){
-        return comp.get(Calendar.YEAR) == today.get(Calendar.YEAR)
-                && comp.get(Calendar.MONTH) == today.get(Calendar.MONTH)
-                && comp.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
-    }
 }
