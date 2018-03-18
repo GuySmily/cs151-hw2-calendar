@@ -31,7 +31,7 @@ public class MyCalendarTester
         System.out.println();
 
         //Shows prompt and gets user input (first character)
-        mainMenu.prompt();
+        char choice = mainMenu.prompt();
         mainMenu.executeOption(choice);
 
 

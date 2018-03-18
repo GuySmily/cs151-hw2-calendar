@@ -45,11 +45,11 @@ public class Menu {
     /**
      * Displays menu name, text, and choices, gets input
      */
-    public void prompt() {
+    public char prompt() {
         System.out.println(generateText());
         Scanner scanner = new Scanner(System.in);
         // todo: Input validation
-        char choice = scanner.next().charAt(0);
+        return scanner.next().charAt(0);
     }
 
     /**
