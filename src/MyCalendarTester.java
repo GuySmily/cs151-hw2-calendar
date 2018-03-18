@@ -1,3 +1,5 @@
+import com.sun.tools.javac.Main;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -10,19 +12,59 @@ public class MyCalendarTester
 {
     public static void main(String [] args)
     {
+        // Create menus
+        Menu mainMenu = new Menu("Main Menu", "Select one of the following options:");
+        mainMenu.addChoice("[L]oad",        null);
+        mainMenu.addChoice("[V]iew by",     null);
+        mainMenu.addChoice("[C]reate",      null);
+        mainMenu.addChoice("[G]o to",       null);
+        mainMenu.addChoice("[E]vent list",  null);
+        mainMenu.addChoice("[D]elete",      null);
+        mainMenu.addChoice("[Q]uit",        null);
+
+
+
         // In case execution spans change of day, this calendar shall represent "today" for the rest of execution
         MyCalendar cal = new MyCalendar(); // defaults to today's date
         cal.set(Calendar.DAY_OF_MONTH, 31);
         cal.printMonth();
         System.out.println();
 
-        cal.add(Calendar.MONTH, 1);
-        cal.printMonth();
-        System.out.println();
+        //Shows prompt and gets user input (first character)
+        mainMenu.prompt();
+        mainMenu.executeOption(choice);
 
-        cal.add(Calendar.MONTH, 1);
-        cal.printMonth();
-        System.out.println();
+
+
+
+//        MainMenuChoice choice = mainMenu.prompt();
+//
+//        mainloop:
+//        switch (choice)
+//        {
+//            case LOAD: // The system loads events.txt to populate the calendar.
+//                break;
+//            case VIEWBY: //
+//                switch (viewMenu.getChoice())
+//                {
+//                    case DAY:
+//                        break;
+//                    case MONTH:
+//                        break;
+//                }
+//                break;
+//            case CREATE: // This option allows the user to schedule an event.
+//                break;
+//            case GOTO: //
+//                break;
+//            case EVENTLIST: //
+//                break;
+//            case DELETE: //
+//                break;
+//            case QUIT: //
+//                break;
+//
+//        }
 //        Scanner sc = new Scanner(System.in);
 //        printCalendar(cal);
 ////        "Select one of the following options: \n"
