@@ -1,3 +1,4 @@
+// ORIGINAL SOURCE: https://codereview.stackexchange.com/a/106478
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,80 +8,69 @@ public class Menu {
     private final String name;
     private final String text;
     private LinkedHashMap<String, Runnable> actionsMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> namesMap = new LinkedHashMap<>();
 
     public Menu(String name, String text) {
         this.name = name;
         this.text = text;
     }
 
-    public void putAction(String name, Runnable action) {
+    /**
+     * Adds item to menu, where item name in [b]rackets is they keypress to select that item
+     * @param name   Item name, with key in [b]rackets
+     * @param action function to be called by this item
+     * @return true if item was successfully added to menu
+     */
+    public boolean addChoice(String name, Runnable action) {
+        int keyLoc = name.indexOf('[');
+        String keyChar;
+
+        //Guard clauses  //todo: more input validation
+        if (keyLoc < 0 || keyLoc >= name.length() - 1) {
+            System.out.println("No key character specified: " + name);
+            return false;
+        }
+        keyChar = name.substring(keyLoc + 1, keyLoc + 2);
+        if (namesMap.get(keyChar) != null){
+            System.out.println("A menu item already exists with this key: " + keyChar);
+            return false;
+        }
+
+        // todo: What's the right data structure for this?  Some kind of table/array?
+        namesMap.put(keyChar, name);
         actionsMap.put(name, action);
+        return true;
     }
 
-    public String generateText() {
+    /**
+     * Displays menu name, text, and choices, gets input
+     */
+    public void prompt() {
+        System.out.println(generateText());
+        Scanner scanner = new Scanner(System.in);
+        // todo: Input validation
+        char choice = scanner.next().charAt(0);
+    }
+
+    /**
+     * Generates text for prompt, with menu name, text, and choices.
+     * @return string containing prompt for user
+     */
+    private String generateText() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(": ");
-        sb.append(text).append(":\n");
+        sb.append(name).append(name.equals("") ? "" : "\n");
+        sb.append(text).append(text.equals("") ? "" : "\n");
         List<String> actionNames = new ArrayList<>(actionsMap.keySet());
         for (int i = 0; i < actionNames.size(); i++) {
-            sb.append(String.format(" %d: %s%n", i + 1, actionNames.get(i)));
+            sb.append(String.format(" %s ", actionNames.get(i)));
         }
         return sb.toString();
     }
 
-    public void executeAction(int actionNumber) {
-        int effectiveActionNumber = actionNumber - 1;
-        if (effectiveActionNumber < 0 || effectiveActionNumber >= actionsMap.size()) {
-            System.out.println("Ignoring menu choice: " + actionNumber);
-        } else {
-            List<Runnable> actions = new ArrayList<>(actionsMap.values());
-            actions.get(effectiveActionNumber).run();
-        }
-    }
-
-    public static class App {
-        private Menu menu;
-        private String password = "blahblah";
-
-        public App() {
-            Menu mainMenu = new Menu("Main", "main menu");
-            Menu subMenuGetPassword = new Menu("Password", "get passwords");
-            Menu subMenuSetPassword = new Menu("Set Password", "set password");
-
-            mainMenu.putAction("get password menu", () -> activateMenu(subMenuGetPassword));
-            mainMenu.putAction("quit", () -> System.exit(0));
-
-            subMenuGetPassword.putAction("get password", () -> System.out.println(password));
-            subMenuGetPassword.putAction("set password menu", () -> activateMenu(subMenuSetPassword));
-            subMenuGetPassword.putAction("main menu", () -> activateMenu(mainMenu));
-            subMenuGetPassword.putAction("quit", () -> System.exit(0));
-
-            subMenuSetPassword.putAction("get password", this::setPassword);
-            subMenuSetPassword.putAction("step back menu", () -> activateMenu(subMenuGetPassword));
-            subMenuSetPassword.putAction("main menu", () -> activateMenu(mainMenu));
-            subMenuSetPassword.putAction("quit", () -> System.exit(0));
-
-            activateMenu(mainMenu);
-        }
-
-        private void activateMenu(Menu newMenu) {
-            menu = newMenu;
-            System.out.println(newMenu.generateText());
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                // TODO some error checking.
-                int actionNumber = scanner.nextInt();
-                menu.executeAction(actionNumber);
-            }
-        }
-
-        private void setPassword() {
-            // TODO ask for password on command lin eand set it
-            password = "p2";
-        }
-    }
-
-    public static void main(String[] args) {
-        new App();
+    public void executeOption(char actionChar) {
+        //TODO: Input validation
+        Runnable action = actionsMap.get(String.valueOf(actionChar));
+        if (action != null)
+            action.run();
     }
 }
