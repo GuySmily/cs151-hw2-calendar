@@ -12,9 +12,9 @@ public class Menu {
     private LinkedHashMap<String, String> namesMap = new LinkedHashMap<>();
 
     /**
-     *
-     * @param name
-     * @param text
+     * Creates a new menu, without any choices.  Call addChoice() to add choices.
+     * @param name Menu name.  Displayed on first line, if not blank.
+     * @param text Description.  Displayed on second line, if not blank.
      */
     public Menu(String name, String text) {
         this.name = name;
@@ -22,7 +22,7 @@ public class Menu {
     }
 
     /**
-     * Adds item to menu, where item name in [b]rackets is they keypress to select that item
+     * Adds item to menu.  Specify key to press by enclosing it in [b]rackets.
      * @param name   Item name, with key in [b]rackets
      * @param action function to be called by this item
      * @return true if item was successfully added to menu
@@ -49,7 +49,8 @@ public class Menu {
     }
 
     /**
-     * Displays menu name, text, and choices, gets input
+     * Displays menu name on first line (if not blank), text on second line (if not blank), and choices on third line.
+     * @return First character that was entered by user
      */
     public char prompt() {
         System.out.println(generateText());
