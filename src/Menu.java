@@ -75,11 +75,12 @@ public class Menu {
     }
 
     /**
-     * NOT USED/TESTED - Runs action for given menu choice
+     * NOT USED - Runs action for given menu choice
      * @param actionChar
      */
     public void executeOption(char actionChar) {
         //TODO: Input validation
+        //TODO: Need to convert actionChar -> Name in namesMap first
         Runnable action = actionsMap.get(String.valueOf(actionChar));
         if (action != null)
             action.run();

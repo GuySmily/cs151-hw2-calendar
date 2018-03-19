@@ -42,7 +42,7 @@ public class MyCalendarTester
         //Shows prompt and gets user input (first character)
         while (true) {
             switch (mainMenu.prompt()) {
-                case 'l':   //load
+                case 'l':   //load ---------------------
                     // The system loads events.txt to populate the calendar.
                     break;
                 case 'v':   //view by
@@ -85,16 +85,19 @@ public class MyCalendarTester
                         }
                     }
                     break;  //end case 'v'
-                case 'c':   //create
-                    // This option allows the user to schedule an event.
+                case 'c':   //create ---------------------
+                    Event myEvent = new Event();  //This constructor includes prompts
+                    cal.addEvent(myEvent);
                     break;
-                case 'g':   //go to
+
+                case 'g':   //go to ---------------------
                     break;
-                case 'e':   //event list
+                case 'e':   //event list ---------------------
+                    cal.printEvents();
                     break;
-                case 'd':   //delete
+                case 'd':   //delete ---------------------
                     break;
-                case 'q':   //quit
+                case 'q':   //quit ---------------------
                     break;
             }
         }

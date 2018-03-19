@@ -1,16 +1,43 @@
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 public class MyCalendar extends GregorianCalendar {
-    private ArrayList<Event> eventArrayList;
+    private TreeSet<Event> events;
+
     //TODO: Is this needed?
     public MyCalendar(){
-        super();
+        events = new TreeSet<>();
     }
 
+    /**
+     * Adds an Event to this calendar
+     * @param newEvent Event to add to calendar
+     */
+    public void addEvent(Event newEvent) {
+        events.add(newEvent);
+    }
+
+    public void printEvents() {
+        SimpleDateFormat sdfYear = new SimpleDateFormat("YYYY");
+        Iterator<Event> eventIterator = events.iterator();
+
+        Event currEvent = null;
+        String year = "";
+        String currYear = "I'm different";
+        while (eventIterator.hasNext()) {
+            currEvent = eventIterator.next();
+            currYear = sdfYear.format(currEvent.getStart().getTime());
+            if (! year.equals(currYear)){
+                year = currYear;
+                System.out.println(year);
+            }
+            System.out.println("  " + currEvent);
+        }
+    }
     /**
      * Print calendar for given year/month, with brackets around specified date if within given year/month.
      * A blank line will not be printed below calendar.

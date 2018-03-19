@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
-public class Event {
+public class Event implements Comparable<Event> {
     String title;
     Calendar start;
     Calendar end;
@@ -26,8 +26,10 @@ public class Event {
      * Event constructor - with prompts for title and start/end dates/times
      */
     public Event() {
-        System.out.println("Please enter event details.");
         start = new GregorianCalendar();
+        end = new GregorianCalendar();
+
+        System.out.println("Please enter event details.");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -49,7 +51,7 @@ public class Event {
             }
         }
         start.setTime(startDate);
-        end.setTime(startDate);  // Only same-day events supported
+        end.setTime(startDate);  // Send end date = start date (Only same-day events supported)
 
         // ------ Start time ------
         Date startTime = null;
@@ -64,10 +66,11 @@ public class Event {
                 System.out.println("Invalid time entry.");
             }
         }
-        start.setTime(startTime);
-
-        // ------ Compile date + time into Calendar object ------
-        //todo?????????
+        //Instead of using deprecated Date functions, use a temporary calendar's setTime() and get()
+        Calendar temp = Calendar.getInstance();
+        temp.setTime(startTime);
+        start.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY));
+        start.set(Calendar.MINUTE, temp.get(Calendar.MINUTE));
 
         // ------ End time ------
         Date endTime = null;
@@ -75,16 +78,41 @@ public class Event {
         {
             System.out.print("End time (HH:mm, on same day, optional): ");
             try {
-                endTime = sdfDate.parse(scanner.next());
+                endTime = sdfTime.parse(scanner.next());
             }
             catch (ParseException e) {
                 System.out.println("Invalid time entry.");
             }
         }
-        end.setTime(endTime);
-
+        temp.setTime(endTime);
+        end.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY));
+        end.set(Calendar.MINUTE, temp.get(Calendar.MINUTE));
     }
 
+    /**
+     * Compares events by their start times.
+     * @param otherEvent Event to compare to.
+     * @return 0 if start date/time are the same.
+     *         Negative if this event starts first.
+     *         Positive if other event starts first.
+     */
+    @Override
+    public int compareTo(Event otherEvent) {
+        //todo: Should we just say otherEvent.start?
+        return this.start.compareTo(otherEvent.getStart());
+    }
+
+    /**
+     * @return Event date and text, WITHOUT YEAR
+     */
+    @Override
+    public String toString() {
+        SimpleDateFormat sdfStart = new SimpleDateFormat("EEE MMM dd HH:mm");
+        SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm");
+        return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
+    }
+
+    // ------ Accessors/Mutators ------
     public void setStart(Calendar start) {
         this.start = start;
     }
