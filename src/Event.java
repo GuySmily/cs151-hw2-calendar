@@ -103,11 +103,16 @@ public class Event implements Comparable<Event> {
     }
 
     /**
-     * @return Event date and text, WITHOUT YEAR
+     * @return Event date/times and text, WITHOUT YEAR
      */
     @Override
     public String toString() {
         SimpleDateFormat sdfStart = new SimpleDateFormat("EEE MMM dd HH:mm");
+        SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm");
+        return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
+    }
+    public String toString(boolean printDate) {
+        SimpleDateFormat sdfStart = new SimpleDateFormat(printDate ? "EEE MMM dd " : "" + "HH:mm");
         SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm");
         return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
     }

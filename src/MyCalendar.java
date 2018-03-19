@@ -1,12 +1,10 @@
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
 public class MyCalendar extends GregorianCalendar {
-    private TreeSet<Event> events;
+    private TreeSet<Event> events;  // see: https://www.geeksforgeeks.org/treeset-in-java-with-examples/
 
     //TODO: Is this needed?
     public MyCalendar(){
@@ -21,7 +19,10 @@ public class MyCalendar extends GregorianCalendar {
         events.add(newEvent);
     }
 
-    public void printEvents() {
+    /**
+     * Prints all events, grouped by year
+     */
+    public void printAllEvents() {
         SimpleDateFormat sdfYear = new SimpleDateFormat("YYYY");
         Iterator<Event> eventIterator = events.iterator();
 
@@ -37,7 +38,62 @@ public class MyCalendar extends GregorianCalendar {
             }
             System.out.println("  " + currEvent);
         }
+        System.out.println();
     }
+
+    /**
+     * Prints the events for the Calendar's current day.
+     */
+    public void printEventsForDay() {
+        Calendar dummyStart = new GregorianCalendar();
+        Calendar dummyEnd = new GregorianCalendar();
+        dummyStart.setTime(this.getTime());
+        dummyEnd.setTime(this.getTime());
+        dummyEnd.add(DAY_OF_MONTH, 1);
+        //Get an iterator for the events in the given range
+        //todo: generalize for use with any range (events in week, month.. parameterize it)
+        Iterator<Event> eventIterator = events.subSet(
+                new Event(dummyStart, dummyStart, "dummy"),
+                new Event(dummyEnd, dummyEnd, "dummy")
+        ).iterator();
+
+        Event currEvent = null;
+        while (eventIterator.hasNext()) {
+            currEvent = eventIterator.next();
+            System.out.println("  " + currEvent.toString(false));
+        }
+        System.out.println();
+    }
+
+
+    /**
+     * Prompt user for a date, and print that day
+     */
+    public void goToDay() {
+        //todo: Turn this into a function, replace here and in Event constructor x2
+        Date startDate = null;
+        SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+        Scanner scanner = new Scanner(System.in);
+        while (startDate == null)
+        {
+            System.out.print("Enter date (MM/dd/yyyy): ");
+            try {
+                startDate = sdfDate.parse(scanner.next());
+            }
+            catch (ParseException e) {
+                System.out.println("Invalid date entry.");
+            }
+        }
+        this.setTime(startDate);
+        this.printDay();
+    }
+
+    public void printDay() {
+        String dayString = new SimpleDateFormat("EEEEEE, MMM d yyyy").format(this.getTime());
+        System.out.println(dayString);
+        printEventsForDay();
+    }
+
     /**
      * Print calendar for given year/month, with brackets around specified date if within given year/month.
      * A blank line will not be printed below calendar.
@@ -103,11 +159,6 @@ public class MyCalendar extends GregorianCalendar {
             c.add(Calendar.DAY_OF_MONTH, 1);
         }
         System.out.println(" "); // TODO: A space gets printed even if there are brackets on the last day of the month
-    }
-
-    public void printDay() {
-        String dayString = new SimpleDateFormat("EEE, MMM d yyyy").format(this.getTime());
-        System.out.println(dayString);
     }
 
     private static boolean dateMatches(Calendar today, Calendar comp){

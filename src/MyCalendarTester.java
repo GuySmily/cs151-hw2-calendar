@@ -1,9 +1,4 @@
-import com.sun.tools.javac.Main;
-
 import java.util.*;
-
-import java.text.SimpleDateFormat;
-import java.text.DateFormatSymbols;
 
 public class MyCalendarTester
 {
@@ -45,7 +40,7 @@ public class MyCalendarTester
                 case 'l':   //load ---------------------
                     // The system loads events.txt to populate the calendar.
                     break;
-                case 'v':   //view by
+                case 'v':   //view by ---------------------
                     char viewChoice = viewMenu.prompt();
 
                     boolean exitView = false;
@@ -91,9 +86,10 @@ public class MyCalendarTester
                     break;
 
                 case 'g':   //go to ---------------------
+                    cal.goToDay();
                     break;
                 case 'e':   //event list ---------------------
-                    cal.printEvents();
+                    cal.printAllEvents();
                     break;
                 case 'd':   //delete ---------------------
                     break;
