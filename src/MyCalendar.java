@@ -1,9 +1,11 @@
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class MyCalendar extends GregorianCalendar {
+    private ArrayList<Event> eventArrayList;
     //TODO: Is this needed?
     public MyCalendar(){
         super();
@@ -74,6 +76,11 @@ public class MyCalendar extends GregorianCalendar {
             c.add(Calendar.DAY_OF_MONTH, 1);
         }
         System.out.println(" "); // TODO: A space gets printed even if there are brackets on the last day of the month
+    }
+
+    public void printDay() {
+        String dayString = new SimpleDateFormat("EEE, MMM d yyyy").format(this.getTime());
+        System.out.println(dayString);
     }
 
     private static boolean dateMatches(Calendar today, Calendar comp){

@@ -52,34 +52,39 @@ public class MyCalendarTester
                     while (!exitView) {
                         switch (viewChoice) {
                             case 'd':
-                                //Display day
-                                cal.printDay();
+                                //Screen 3: Select [V]iew by and choose the Day view and show the current Day view.
+                                cal.printDay();  //Display day
                                 //todo: print events
                                 break;
 
                             default: //case 'm':
+                                //Screen 7: Select [M]ain menu and select [V]iew by and [M]onth view and show the current Month view.
                                 viewChoice = 'm';
-                                //Display month
-                                cal.printMonth();
+                                cal.printMonth();  //Display month
                                 //todo: print events
                                 break;
                         }
 
                         char navChoice = navMenu.prompt();
                         switch (navChoice) {
+                            //Screen 4: From the Day view, press [P]revious and show the previous day.
+                            //Screen 5: From the previous view, press [N]ext THREE times and show the next day.
+                            //Screen 6: Move the Day view to show a day with an event.
+                            //Screen 8: Move the Month view to show a month with an event.
                             case 'p':   //Prev
                             case 'n':   //Next
                                 cal.add(viewChoice == 'd' ? Calendar.DAY_OF_MONTH : Calendar.MONTH,
                                         navChoice == 'p' ? -1 : 1);
                                 break;
-                            default: //case 'm':   //Main menu
+                            case 'm':   //Main menu
                                 //todo: reset cal to today's date?
                                 exitView = true;
                                 break;
+                            default:
+                                // Do nothing - the same day will be reprinted
                         }
                     }
-                    break;  //end View by
-                //}
+                    break;  //end case 'v'
                 case 'c':   //create
                     // This option allows the user to schedule an event.
                     break;
@@ -101,13 +106,7 @@ public class MyCalendarTester
 //
 //        //Screen 2: [L]oad your events.txt and show [E]vent list
 //
-//        //Screen 3: Select [V]iew by and choose the Day view and show the current Day view.
 //
-//        //Screen 4: From the Day view, press [P]revious and show the previous day.
-//        //Screen 5: From the previous view, press [N]ext THREE times and show the next day.
-//        //Screen 6: Move the Day view to show a day with an event.
-//        //Screen 7: Select [M]ain menu and select [V]iew by and [M]onth view and show the current Month view.
-//        //Screen 8: Move the Month view to show a month with an event.
 //        //Screen 9: Select [C]reate and create an event. Show [E]vent list to confirm that the event is created.
 //        //Screen 10: Select [C]reate and create an event with time conflict. Show you handled the time conflict.
 //        //Screen 11: [G]o to a specific date with multiple events and show the events are listed in order.
