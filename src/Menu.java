@@ -1,4 +1,5 @@
 // ORIGINAL SOURCE: https://codereview.stackexchange.com/a/106478
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +11,11 @@ public class Menu {
     private LinkedHashMap<String, Runnable> actionsMap = new LinkedHashMap<>();
     private LinkedHashMap<String, String> namesMap = new LinkedHashMap<>();
 
+    /**
+     *
+     * @param name
+     * @param text
+     */
     public Menu(String name, String text) {
         this.name = name;
         this.text = text;
@@ -37,7 +43,7 @@ public class Menu {
         }
 
         // todo: What's the right data structure for this?  Some kind of table/array?
-        namesMap.put(keyChar, name);
+        namesMap.put(keyChar.toLowerCase(), name);
         actionsMap.put(name, action);
         return true;
     }
@@ -49,7 +55,7 @@ public class Menu {
         System.out.println(generateText());
         Scanner scanner = new Scanner(System.in);
         // todo: Input validation
-        return scanner.next().charAt(0);
+        return Character.toLowerCase(scanner.next().charAt(0));
     }
 
     /**
@@ -67,6 +73,10 @@ public class Menu {
         return sb.toString();
     }
 
+    /**
+     * NOT USED/TESTED - Runs action for given menu choice
+     * @param actionChar
+     */
     public void executeOption(char actionChar) {
         //TODO: Input validation
         Runnable action = actionsMap.get(String.valueOf(actionChar));
