@@ -53,22 +53,26 @@ public class MyCalendarTester
                         switch (viewChoice) {
                             case 'd':
                                 //Display day
+                                cal.printDay();
+                                //todo: print events
                                 break;
 
-                            case 'm':
+                            default: //case 'm':
+                                viewChoice = 'm';
                                 //Display month
                                 cal.printMonth();
+                                //todo: print events
                                 break;
                         }
 
-                        switch (navMenu.prompt()) {
+                        char navChoice = navMenu.prompt();
+                        switch (navChoice) {
                             case 'p':   //Prev
-                                cal.add(viewChoice == 'd' ? Calendar.DAY_OF_MONTH : Calendar.MONTH, -1);
-                                break;
                             case 'n':   //Next
-                                cal.add(viewChoice == 'd' ? Calendar.DAY_OF_MONTH : Calendar.MONTH, 1);
+                                cal.add(viewChoice == 'd' ? Calendar.DAY_OF_MONTH : Calendar.MONTH,
+                                        navChoice == 'p' ? -1 : 1);
                                 break;
-                            case 'm':   //Main menu
+                            default: //case 'm':   //Main menu
                                 //todo: reset cal to today's date?
                                 exitView = true;
                                 break;
