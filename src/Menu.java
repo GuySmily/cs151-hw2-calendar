@@ -68,7 +68,7 @@ public class Menu {
         sb.append(text).append(text.equals("") ? "" : "\n");
         List<String> actionNames = new ArrayList<>(actionsMap.keySet());
         for (int i = 0; i < actionNames.size(); i++) {
-            sb.append(String.format(" %s ", actionNames.get(i)));
+            sb.append(String.format("%s  ", actionNames.get(i)));
         }
         return sb.toString();
     }
