@@ -6,6 +6,7 @@ public class MyCalendarTester
     {
         // --------- Create menus ---------
         // Main menu
+        //Note: Second parameter not used in this implementation.
         Menu mainMenu = new Menu("", "Select one of the following options:");
         mainMenu.addChoice("[L]oad",        null);
         mainMenu.addChoice("[V]iew by",     null);
@@ -26,6 +27,16 @@ public class MyCalendarTester
         navMenu.addChoice("[N]ext",        null);
         navMenu.addChoice("[M]ain menu",   null);
 
+        // Delete menu
+        Menu deleteMenu = new Menu("", "Which events should be deleted?");
+        deleteMenu.addChoice("[S]elected",    null);
+        deleteMenu.addChoice("[A]ll",         null);
+
+        // Yes/No  ((wow this feels so VB6))
+        Menu yesNoMenu = new Menu("", "");
+        yesNoMenu.addChoice("[Y]es",    null);
+        yesNoMenu.addChoice("[N]o",         null);
+
         // --------- Create calendar ---------
         MyCalendar cal = new MyCalendar(); // defaults to today's date
 
@@ -35,11 +46,14 @@ public class MyCalendarTester
         System.out.println();
 
         //Shows prompt and gets user input (first character)
+        mainLoop:  //Label for breaking out when user wants to quit
         while (true) {
             switch (mainMenu.prompt()) {
                 case 'l':   //load ---------------------
                     // The system loads events.txt to populate the calendar.
+                    cal.loadEvents();
                     break;
+
                 case 'v':   //view by ---------------------
                     char viewChoice = viewMenu.prompt();
 
@@ -80,21 +94,60 @@ public class MyCalendarTester
                         }
                     }
                     break;  //end case 'v'
-                case 'c':   //create ---------------------
+
+                case 'c':   //create event ---------------------
                     Event myEvent = new Event();  //This constructor includes prompts
                     cal.addEvent(myEvent);
+                    System.out.println();
                     break;
 
                 case 'g':   //go to ---------------------
                     cal.goToDay();
                     break;
+
                 case 'e':   //event list ---------------------
                     cal.printAllEvents();
                     break;
+
                 case 'd':   //delete ---------------------
+                    Date dayToDelete = cal.promptForDate();
+                    cal.setTime(dayToDelete);  // Set date to day entered by user
+                    cal.printDay();
+                    char deleteChoice = deleteMenu.prompt();
+                    switch (deleteChoice) {
+                        case 's':   //Selected
+                            //Note: No requirements were specified for selecting events
+                            System.out.println("Which event?");  //todo: Don't even ask if there's only one event
+
+                            // Get iterator of events
+                            Iterator<Event> eventIterator = cal.getEventIteratorForSingleDayOfEvents();
+                            Event currEvent = null;
+                            // loop through events
+                            while (eventIterator.hasNext()) {
+                                currEvent = eventIterator.next();
+                                System.out.print(currEvent.toString() + "? ");
+                                switch (yesNoMenu.prompt()) {
+                                    case 'y':
+                                        // TODO: Current implementation of Comparable cannot distinguish between different events with same start time.
+                                        cal.deleteEvent(currEvent);
+                                        break;
+                                    default:
+                                        // Do nothing
+                                }
+                                //todo: change from loop to removeAll(eventCollection)?
+                            }
+
+                            break;
+                        case 'a':   //All
+                            cal.deleteEventsForEntireDay();
+                            break;
+                        default:
+                            System.out.println("Invalid entry.  Nothing deleted.");
+                    }
                     break;
                 case 'q':   //quit ---------------------
-                    break;
+                    if (cal.saveEvents())  //Don't quit if events weren't saved
+                        break mainLoop;
             }
         }
 //        Scanner sc = new Scanner(System.in);
@@ -112,21 +165,7 @@ public class MyCalendarTester
 //        //Screen 12: Select [D]elete and [S]elected to delete a selected event scheduled on a particular date. After deleting it, doe [E]vent list to show the result of the deletion.
 //        //Screen 13: Select [D]elete and [A]ll to delete all events on a particular date. After deleting it, doe [E]vent list to show the result of the deletion.
 //        //Screen 14: Create two more events and quit. Show your events.txt.
-//        while (sc.hasNextLine())
-//        {
-//            String input = sc.nextLine();
-//            if (input.equals("p"))
-//            {
-//                cal.add(Calendar.MONTH,-1);
-//                printCalendar(cal);
-//            }
-//            else if (input.equals("n"))
-//            {
-//                cal.add(Calendar.MONTH,1);
-//                printCalendar(cal);
-//            }
-//        }
-//        System.out.println("Bye!");
+
     }
 
 

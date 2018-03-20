@@ -1,10 +1,12 @@
-// ORIGINAL SOURCE: https://codereview.stackexchange.com/a/106478
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * A Menu system that automatically converts bracketed [C]haracter into keys for selection
+ * ORIGINAL SOURCE: https://codereview.stackexchange.com/a/106478
+ */
 public class Menu {
     private final String name;
     private final String text;
@@ -75,8 +77,8 @@ public class Menu {
     }
 
     /**
-     * NOT USED - Runs action for given menu choice
-     * @param actionChar
+     * NOT USED / NOT FULLY IMPLEMENTED - Runs action for given menu choice
+     * @param actionChar menu item's character
      */
     public void executeOption(char actionChar) {
         //TODO: Input validation

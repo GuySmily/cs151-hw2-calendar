@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -5,7 +6,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
-public class Event implements Comparable<Event> {
+/**
+ * An event with title, start date/time (Calendar), and end date/time (Calendar)
+ */
+public class Event implements Comparable<Event>, Serializable {
     String title;
     Calendar start;
     Calendar end;
@@ -44,7 +48,7 @@ public class Event implements Comparable<Event> {
         {
             System.out.print("Start date (MM/dd/yyyy): ");
             try {
-                startDate = sdfDate.parse(scanner.next());
+                startDate = sdfDate.parse(scanner.nextLine());
             }
             catch (ParseException e) {
                 System.out.println("Invalid date entry.");
@@ -66,7 +70,7 @@ public class Event implements Comparable<Event> {
                 System.out.println("Invalid time entry.");
             }
         }
-        //Instead of using deprecated Date functions, use a temporary calendar's setTime() and get()
+        // Date methods are deprecated, so create a temporary calendar and do setTime() and get()
         Calendar temp = Calendar.getInstance();
         temp.setTime(startTime);
         start.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY));
@@ -76,7 +80,7 @@ public class Event implements Comparable<Event> {
         Date endTime = null;
         while (endTime == null)
         {
-            System.out.print("End time (HH:mm, on same day, optional): ");
+            System.out.print("End time (HH:mm, on same day,  Type same time as start for no end time): ");
             try {
                 endTime = sdfTime.parse(scanner.next());
             }
@@ -109,12 +113,22 @@ public class Event implements Comparable<Event> {
     public String toString() {
         SimpleDateFormat sdfStart = new SimpleDateFormat("EEE MMM dd HH:mm");
         SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm");
-        return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
+        //return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
+        return sdfStart.format(start.getTime())
+                + (start.getTime().equals(end.getTime()) ? "" : " - " + sdfEnd.format(end.getTime()))
+                + " " + title;
     }
+    /**
+     * @param printDate whether to include the date as well, or only the time
+     * @return String: start date if opted + start time + end time + title
+     */
     public String toString(boolean printDate) {
         SimpleDateFormat sdfStart = new SimpleDateFormat(printDate ? "EEE MMM dd " : "" + "HH:mm");
         SimpleDateFormat sdfEnd = new SimpleDateFormat("HH:mm");
-        return sdfStart.format(start.getTime()) + " - " + sdfEnd.format(end.getTime()) + " " + title;
+
+        return sdfStart.format(start.getTime())
+                + (start.getTime().equals(end.getTime()) ? "" : " - " + sdfEnd.format(end.getTime()))
+                + " " + title;
     }
 
     // ------ Accessors/Mutators ------
