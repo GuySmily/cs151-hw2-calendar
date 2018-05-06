@@ -34,6 +34,7 @@ public class SimpleCalendarView {
         gbc.gridx = 0;
         gbc.weightx = 0;
         gbc.weighty = 0;
+        gbc.insets = new Insets(5,5,5,5);
         gbc.anchor = GridBagConstraints.LINE_START;
         frame.add(monthPanel, gbc);
 
@@ -42,6 +43,8 @@ public class SimpleCalendarView {
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5,5,5,5);
         gbc.anchor = GridBagConstraints.CENTER;
         frame.add(dayPanel, gbc);
 
@@ -124,6 +127,7 @@ class DayPanel extends JPanel {
             JLabel hourLabel = new JLabel(hour);
             gbc.gridy = row * CELLS_PER_HOUR;
             gbc.gridx = 0;
+            gbc.weightx = 0;
             gbc.gridheight = CELLS_PER_HOUR;
             gbc.anchor = GridBagConstraints.FIRST_LINE_END;
             gridPanel.add(hourLabel,gbc);
@@ -132,12 +136,14 @@ class DayPanel extends JPanel {
             JPanel cellPanel = new JPanel();
             // second dimension is subdivisions within hour
             for (int sub = 0; sub < CELLS_PER_HOUR; sub++){
-                labels[row][sub] = new JLabel("_" + sub, SwingConstants.CENTER);
+                labels[row][sub] = new JLabel("_" + sub);  //, SwingConstants.CENTER
                 cellPanel.add(labels[row][sub]);
                 gbc.gridy = row * CELLS_PER_HOUR + sub;
                 gbc.gridx = 1;
+                gbc.weightx = 1;
                 gbc.gridheight = 1;
-                gbc.anchor = GridBagConstraints.CENTER;
+                gbc.insets = new Insets(0, 5, 0, 5);
+                gbc.anchor = GridBagConstraints.LINE_START;
                 gridPanel.add(cellPanel, gbc);
             }
         }
@@ -152,16 +158,16 @@ class DayPanel extends JPanel {
         gbc = new GridBagConstraints();  //Reset everything to default
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.weightx = 0;
-        gbc.weighty = .5;
+        gbc.weightx = .5;
+        gbc.weighty = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(headerPanel, gbc);
 
         //Grid
         gbc.gridy = 1;
         gbc.gridx = 0;
-        gbc.weightx = 1;
-        gbc.weighty = .5;
+        gbc.weightx = .5;
+        gbc.weighty = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.PAGE_START;
         this.add(gridPanel, gbc);
