@@ -9,13 +9,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class SimpleCalendarView {
-    MyCalendar calendarModel;
+    MyCalendar calendarModel;  //Stores the selected/displayed date and Event storage
     public SimpleCalendarView(MyCalendar calendar){
         this.calendarModel = calendar;
 
-
         final JFrame frame = new JFrame();
-        frame.setSize(400, 700);
+        frame.setSize(500, 400);
         frame.setTitle("PedrosaTech Calendar");
         frame.setLayout(new GridBagLayout());
 
@@ -73,17 +72,29 @@ class DayPanel extends JPanel {
 
         //-----------------------------------------------------------
         //Create header panel
+        //todo: We can probably re-use this for both Day & Month views
         //-----------------------------------------------------------
         JPanel headerPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        //Left arrow
+        //Weekday
         gbc.gridy = 0;
         gbc.gridx = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        headerLabel = new JLabel();  //Initialize the label
+        headerPanel.add(headerLabel, gbc);
+        updateHeader();
+
+        //Left arrow
+        gbc.gridy = 0;
+        gbc.gridx++;
         gbc.weightx = 0;  // Shrink to minimum
         gbc.weighty = 0;  // Shrink to minimum
-        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.anchor = GridBagConstraints.LINE_END;
         JButton prevMonth = new JButton(" < ");
         //Trick: By setting a border the button becomes much smaller, and
         //       though we lose the 3d effect we keep the color change on click
@@ -91,22 +102,12 @@ class DayPanel extends JPanel {
         headerPanel.add(prevMonth, gbc);
         prevMonth.addActionListener(e -> selectedDate.add(Calendar.DAY_OF_YEAR, -1));
 
-        //Month Name + Year
-        gbc.gridy = 0;
-        gbc.gridx++;
-        gbc.weightx = 1;
-        gbc.weighty = 0;  // Shrink to minimum
-        gbc.anchor = GridBagConstraints.CENTER;
-        headerLabel = new JLabel();  //Initialize the label
-        headerPanel.add(headerLabel, gbc);
-        updateHeader();
-
         //Right arrow
         gbc.gridy = 0;
         gbc.gridx++;
         gbc.weightx = 0;  // Shrink to minimum
         gbc.weighty = 0;  // Shrink to minimum
-        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.anchor = GridBagConstraints.LINE_START;
         JButton nextMonth = new JButton(" > ");
         nextMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         headerPanel.add(nextMonth, gbc);
@@ -120,30 +121,52 @@ class DayPanel extends JPanel {
         //Initialize labels for every grid cell
         for(int row = 0; row < 24; row++) {
             //Hour label
+            //JPanel hourLabelPanel = new JPanel();
             String hour;
             if (row == 0) { hour = "12am"; }
             else if (row == 12) { hour = "12pm"; }
             else if (row < 12) { hour = row + "am"; }
             else { hour = String.valueOf(row - 12) + "pm"; }
             JLabel hourLabel = new JLabel(hour);
+            hourLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+            hourLabel.setVerticalAlignment(SwingConstants.TOP);
+            //hourLabelPanel.add(hourLabel);
             gbc.gridy = row * CELLS_PER_HOUR;
             gbc.gridx = 0;
             gbc.weightx = 0;
+            gbc.weighty = .5;
             gbc.gridheight = CELLS_PER_HOUR;
-            gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-            gridPanel.add(hourLabel,gbc);
+            gbc.insets = new Insets(0, 5, 0, 0);  //Give the text a little space
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.FIRST_LINE_END;  // Doesn't work
+            //hourLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+            //hourLabelPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+            gridPanel.add(hourLabel, gbc);
 
-            //Event label
-            JPanel cellPanel = new JPanel();
             // second dimension is subdivisions within hour
             for (int sub = 0; sub < CELLS_PER_HOUR; sub++){
-                labels[row][sub] = new JLabel("_" + sub);  //, SwingConstants.CENTER
-                cellPanel.add(labels[row][sub]);
+                //Create Event label
+                JPanel cellPanel = new JPanel(new GridBagLayout());
+                cellPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+                labels[row][sub] = new JLabel(" ");  //row + "_" + sub, SwingConstants.CENTER
+                //labels[row][sub].setBorder(BorderFactory.createLineBorder(Color.GREEN));
+
+                //Add Event label to cell
+                GridBagConstraints cellGBC = new GridBagConstraints();
+                cellGBC.gridx = 0; cellGBC.gridy = 0;
+                cellGBC.weighty = .5; cellGBC.weightx = .5;
+                cellGBC.fill = GridBagConstraints.BOTH;
+                cellGBC.anchor = GridBagConstraints.LINE_START;
+                cellPanel.add(labels[row][sub], cellGBC);
+
+                //Add cell panel to grid panel
                 gbc.gridy = row * CELLS_PER_HOUR + sub;
                 gbc.gridx = 1;
                 gbc.weightx = 1;
+                gbc.weighty = .5;
                 gbc.gridheight = 1;
-                gbc.insets = new Insets(0, 5, 0, 5);
+                gbc.insets = new Insets(0, 0, 0, 0);
+                gbc.fill = GridBagConstraints.HORIZONTAL;
                 gbc.anchor = GridBagConstraints.LINE_START;
                 gridPanel.add(cellPanel, gbc);
             }
@@ -162,6 +185,7 @@ class DayPanel extends JPanel {
         gbc.weightx = .5;
         gbc.weighty = 0;
         gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(headerPanel, gbc);
 
         //Grid
