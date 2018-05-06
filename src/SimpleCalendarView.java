@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -21,7 +20,7 @@ public class SimpleCalendarView {
         MonthPanel monthPanel = new MonthPanel(calendarModel);
 
         //Day section
-        //DayPanel dayPanel = new DayPanel(calendarModel);
+        DayPanel dayPanel = new DayPanel(calendarModel);
 
         /*/**********************************************************
          * Finalize window frame
@@ -31,9 +30,17 @@ public class SimpleCalendarView {
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.weightx = .5;
-        gbc.weighty = 0;  // Shrink to minimum
-        gbc.anchor = GridBagConstraints.PAGE_START;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
         frame.add(monthPanel, gbc);
+
+        //Add DayPanel to window
+        gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        frame.add(dayPanel, gbc);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -43,6 +50,17 @@ public class SimpleCalendarView {
 class DayPanel extends JPanel {
     private GregorianCalendar cal;
 
+    public DayPanel(GregorianCalendar initialDate){
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        //Get the date (BUT NOT TIME) from the calendar passed in
+        cal = new GregorianCalendar(initialDate.get(Calendar.YEAR), initialDate.get(Calendar.MONTH), initialDate.get(Calendar.DAY_OF_MONTH));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE M/d");
+        JLabel monthLabel = new JLabel(sdf.format(cal.getTime()));
+        this.add(monthLabel, gbc);
+    }
 }
 
 /**
@@ -53,7 +71,7 @@ class DayPanel extends JPanel {
  * Buttons change month view without changing the actual calendar date
  */
 class MonthPanel extends JPanel {
-    private GregorianCalendar cal;
+    private GregorianCalendar cal;  //todo: This should be looking at the model
 
     final int ROWS = 7;
     final int COLS = 7;
