@@ -256,12 +256,23 @@ public class MyCalendar extends GregorianCalendar {
     }
 
     /**
+     * Checks if this calendar's date is the same as another one.
+     * @param other Calendar object to compare to
+     * @return true if dates are the same regardless of their times
+     */
+    public boolean dateEquals(Calendar other){
+        return this.get(Calendar.YEAR) == other.get(Calendar.YEAR)
+                && this.get(Calendar.MONTH) == other.get(Calendar.MONTH)
+                && this.get(Calendar.DAY_OF_MONTH) == other.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
      * Checks if two dates (Calendar objects) are the same without comparing their times.
      * @param today Calender object
      * @param comp Calendar object to compare to
      * @return true if dates are the same regardless of their times
      */
-    private static boolean dateMatches(Calendar today, Calendar comp){
+    public static boolean dateMatches(Calendar today, Calendar comp){
         return comp.get(Calendar.YEAR) == today.get(Calendar.YEAR)
                 && comp.get(Calendar.MONTH) == today.get(Calendar.MONTH)
                 && comp.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
