@@ -53,8 +53,8 @@ public class SimpleCalendarView {
 class DayPanel extends JPanel {
     private static final int CELLS_PER_HOUR = 2;
     private ObservedCalendar selectedDate;  // todo: This should be represented by the application model
-    JLabel headerLabel;
-    JLabel[][] labels;
+    private JLabel headerLabel;
+    private JLabel[][] labels;
 
     public DayPanel(GregorianCalendar initialDate){
         this.setLayout(new GridBagLayout());
@@ -68,7 +68,7 @@ class DayPanel extends JPanel {
         });
 
         //-----------------------------------------------------------
-        //Create month label panel
+        //Create header panel
         //-----------------------------------------------------------
         JPanel headerPanel = new JPanel(new GridBagLayout());
 
@@ -109,7 +109,7 @@ class DayPanel extends JPanel {
         nextMonth.addActionListener(e -> selectedDate.add(Calendar.DAY_OF_YEAR, 1));
 
         //-----------------------------------------------------------
-        //Create month grid panel
+        //Create grid panel
         //-----------------------------------------------------------
         JPanel gridPanel = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();  //reset gbc
@@ -118,6 +118,7 @@ class DayPanel extends JPanel {
             //Hour label
             String hour;
             if (row == 0) { hour = "12am"; }
+            else if (row == 12) { hour = "12pm"; }
             else if (row < 12) { hour = row + "am"; }
             else { hour = String.valueOf(row - 12) + "pm"; }
             JLabel hourLabel = new JLabel(hour);
