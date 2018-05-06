@@ -32,7 +32,7 @@ public class SimpleCalendarView {
         //Add MonthPanel to window
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.weightx = .5;
+        gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.anchor = GridBagConstraints.LINE_START;
         frame.add(monthPanel, gbc);
@@ -40,7 +40,7 @@ public class SimpleCalendarView {
         //Add DayPanel to window
         gbc.gridy = 0;
         gbc.gridx = 1;
-        gbc.weightx = 0;
+        gbc.weightx = 1;
         gbc.weighty = 0;
         gbc.anchor = GridBagConstraints.CENTER;
         frame.add(dayPanel, gbc);
@@ -149,7 +149,6 @@ class DayPanel extends JPanel {
         //-----------------------------------------------------------
         //Header
         gbc = new GridBagConstraints();  //Reset everything to default
-        //Add MonthHeader to window
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.weightx = 0;
