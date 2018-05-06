@@ -15,7 +15,7 @@ public class SimpleCalendarView {
 
 
         final JFrame frame = new JFrame();
-        frame.setSize(400, 300);
+        frame.setSize(400, 700);
         frame.setTitle("PedrosaTech Calendar");
         frame.setLayout(new GridBagLayout());
 
@@ -33,7 +33,8 @@ public class SimpleCalendarView {
         gbc.gridy = 0;
         gbc.gridx = 0;
         gbc.weightx = 0;
-        gbc.weighty = 0;
+        gbc.weighty = .5;
+        gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(5,5,5,5);
         gbc.anchor = GridBagConstraints.LINE_START;
         frame.add(monthPanel, gbc);
@@ -42,7 +43,7 @@ public class SimpleCalendarView {
         gbc.gridy = 0;
         gbc.gridx = 1;
         gbc.weightx = 1;
-        gbc.weighty = 0;
+        gbc.weighty = .5;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5,5,5,5);
         gbc.anchor = GridBagConstraints.CENTER;
@@ -168,9 +169,13 @@ class DayPanel extends JPanel {
         gbc.gridx = 0;
         gbc.weightx = .5;
         gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.PAGE_START;
-        this.add(gridPanel, gbc);
+        //Stuff it in a scroller
+        JScrollPane gridScroller = new JScrollPane(gridPanel);
+        gridScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        gridScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.add(gridScroller, gbc);
     }
     /**
      * Updates the text of the monthLabel to the current month
