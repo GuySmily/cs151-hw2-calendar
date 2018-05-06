@@ -1,7 +1,10 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -71,11 +74,14 @@ class DayPanel extends JPanel {
  * Buttons change month view without changing the actual calendar date
  */
 class MonthPanel extends JPanel {
-    private GregorianCalendar cal;  //todo: This should be looking at the model
+    private ObservedCalendar displayedMonth;  // This acts as the model for this panel
+    private ObservedCalendar selectedDate;  // todo: This should be represented by the application model
 
     final int ROWS = 7;
     final int COLS = 7;
-    JLabel[][] labels = new JLabel[ROWS][COLS];
+    JLabel[][] labels;
+    JLabel monthLabel;
+
 
     /**
      * Creates a Panel with view of the month
@@ -83,9 +89,15 @@ class MonthPanel extends JPanel {
      */
     public MonthPanel(GregorianCalendar initialDate){
         this.setLayout(new GridBagLayout());
+        labels = new JLabel[ROWS][COLS];
 
+        selectedDate = new ObservedCalendar(initialDate); // todo: This should be represented by the application model
         //Get the date (BUT NOT TIME) from the calendar passed in
-        cal = new GregorianCalendar(initialDate.get(Calendar.YEAR), initialDate.get(Calendar.MONTH), initialDate.get(Calendar.DAY_OF_MONTH));
+        displayedMonth = new ObservedCalendar(initialDate);
+        displayedMonth.attach(e -> {
+            updateMonthLabel();
+            updateMonthGrid();
+        });
 
         //-----------------------------------------------------------
         //Create month label panel
@@ -105,6 +117,7 @@ class MonthPanel extends JPanel {
         //       though we lose the 3d effect we keep the color change on click
         prevMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         monthHeader.add(prevMonth, gbc);
+        prevMonth.addActionListener(e -> displayedMonth.add(Calendar.MONTH, -1));
 
         //Month Name + Year
         gbc.gridy = 0;
@@ -112,8 +125,8 @@ class MonthPanel extends JPanel {
         gbc.weightx = 1;
         gbc.weighty = 0;  // Shrink to minimum
         gbc.anchor = GridBagConstraints.CENTER;
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMMM yyyy");
-        JLabel monthLabel = new JLabel(sdf.format(cal.getTime()));
+        monthLabel = new JLabel();
+        updateMonthLabel();
         monthHeader.add(monthLabel, gbc);
 
         //Right arrow
@@ -125,8 +138,7 @@ class MonthPanel extends JPanel {
         JButton nextMonth = new JButton(" > ");
         nextMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         monthHeader.add(nextMonth, gbc);
-
-        //Add monthHeader to monthPanel later
+        nextMonth.addActionListener(e -> displayedMonth.add(Calendar.MONTH, 1));
 
         //-----------------------------------------------------------
         //Create month grid panel
@@ -143,36 +155,7 @@ class MonthPanel extends JPanel {
         }
 
         //Day numbers
-        //Create a temporary calendar object for parsing through month without editing our current day
-        GregorianCalendar c = new GregorianCalendar();
-        c.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 1);
-        //Rewind the calendar to start at the first day of the week (Sunday for USA)
-        while (c.get(Calendar.DAY_OF_WEEK) != c.getFirstDayOfWeek()) {
-            c.add(Calendar.DAY_OF_YEAR, -1);
-        }
-        //Set values for all the labels in the grid
-        for(int row = 1; row < ROWS; row++) {
-            for(int col = 0; col < COLS; col++) {
-                //Also print day label in row 0
-                if(row == 1){
-                    labels[0][col].setText(new SimpleDateFormat("EEE").format(c.getTime()).substring(0,2));
-                }
-                //Set text value
-                labels[row][col].setText(String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
-
-                //Set/remove border
-                labels[row][col].setBorder(dateMatches(c, cal) ?
-                    BorderFactory.createLineBorder(Color.GRAY, 1)  // Border if date matches
-                    : BorderFactory.createEmptyBorder()                     // No border if mismatch
-                );
-
-                //Gray out days outside of month (visual only - still should be clickable)
-                labels[row][col].setForeground(monthMatches(c, cal) ? Color.BLACK :Color.GRAY);
-
-                //increment day
-                c.add(Calendar.DAY_OF_YEAR, 1);
-            }
-        }
+        updateMonthGrid();
 
         //-----------------------------------------------------------
         // Add components to MonthPanel
@@ -198,6 +181,50 @@ class MonthPanel extends JPanel {
     }
 
     /**
+     * Updates the text of the monthLabel to the current month
+     */
+    private void updateMonthLabel(){
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMMM yyyy");
+        monthLabel.setText(sdf.format(displayedMonth.getTime()));
+    }
+
+    /**
+     * Updates the text of the monthGrid's labels
+     */
+    private void updateMonthGrid(){
+        //Create a temporary calendar object for parsing through month without editing our current day
+        GregorianCalendar c = new GregorianCalendar();
+        c.set(displayedMonth.get(Calendar.YEAR), displayedMonth.get(Calendar.MONTH), 1);
+        //Rewind the calendar to start at the first day of the week (Sunday for USA)
+        while (c.get(Calendar.DAY_OF_WEEK) != c.getFirstDayOfWeek()) {
+            c.add(Calendar.DAY_OF_YEAR, -1);
+        }
+        //Set values for all the labels in the grid
+        for(int row = 1; row < ROWS; row++) {
+            for(int col = 0; col < COLS; col++) {
+                //Also print day label in row 0
+                if(row == 1){
+                    labels[0][col].setText(new SimpleDateFormat("EEE").format(c.getTime()).substring(0,2));
+                }
+                //Set text value
+                labels[row][col].setText(String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
+
+                //Set/remove border for selected date / other dates
+                labels[row][col].setBorder(dateMatches(c, selectedDate) ?
+                        BorderFactory.createLineBorder(Color.GRAY, 1)  // Border if date matches
+                        : BorderFactory.createEmptyBorder()                     // No border if mismatch
+                );
+
+                //Gray out days outside of month (visual only - still should be clickable)
+                labels[row][col].setForeground(monthMatches(c, displayedMonth) ? Color.BLACK :Color.GRAY);
+
+                //increment day
+                c.add(Calendar.DAY_OF_YEAR, 1);
+            }
+        }
+    }
+
+    /**
      * Checks if two dates (Calendar objects) are the same without comparing their times.
      * @param today Calender object
      * @param comp Calendar object to compare to
@@ -217,5 +244,40 @@ class MonthPanel extends JPanel {
      */
     private static boolean monthMatches(Calendar today, Calendar comp){
         return comp.get(Calendar.MONTH) == today.get(Calendar.MONTH);
+    }
+}
+
+/**
+ * Decorator class for GregorianCalendar
+ * Adds notifications to add() function
+ */
+class ObservedCalendar extends GregorianCalendar{
+    private GregorianCalendar c;
+    private ArrayList<ChangeListener> listeners;
+
+    /**
+     * Constructs an Observed calendar from the year/month/day of passed calendar WITHOUT TIME
+     * @param cal calendar to copy date from
+     */
+    ObservedCalendar(GregorianCalendar cal){
+        c = new GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+        listeners = new ArrayList<>();
+    }
+
+    /**
+     * Attach a listener
+     * @param l the listener
+     */
+    public void attach(ChangeListener l)
+    {
+        listeners.add(l);
+    }
+
+    @Override
+    public void add(int field, int amount) {
+        super.add(field, amount);
+        for (ChangeListener l : listeners){
+            l.stateChanged(new ChangeEvent(this));
+        }
     }
 }
