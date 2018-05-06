@@ -51,18 +51,133 @@ public class SimpleCalendarView {
 }
 
 class DayPanel extends JPanel {
-    private GregorianCalendar cal;
+    private static final int CELLS_PER_HOUR = 2;
+    private ObservedCalendar selectedDate;  // todo: This should be represented by the application model
+    JLabel headerLabel;
+    JLabel[][] labels;
 
     public DayPanel(GregorianCalendar initialDate){
         this.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        labels = new JLabel[24][CELLS_PER_HOUR];
 
         //Get the date (BUT NOT TIME) from the calendar passed in
-        cal = new GregorianCalendar(initialDate.get(Calendar.YEAR), initialDate.get(Calendar.MONTH), initialDate.get(Calendar.DAY_OF_MONTH));
+        selectedDate = new ObservedCalendar(initialDate); // todo: This should be represented by the application model
+        selectedDate.attach(e -> {
+            updateHeader();
+            updateGrid();
+        });
 
+        //-----------------------------------------------------------
+        //Create month label panel
+        //-----------------------------------------------------------
+        JPanel headerPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        //Left arrow
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.weightx = 0;  // Shrink to minimum
+        gbc.weighty = 0;  // Shrink to minimum
+        gbc.anchor = GridBagConstraints.LINE_START;
+        JButton prevMonth = new JButton(" < ");
+        //Trick: By setting a border the button becomes much smaller, and
+        //       though we lose the 3d effect we keep the color change on click
+        prevMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        headerPanel.add(prevMonth, gbc);
+        prevMonth.addActionListener(e -> selectedDate.add(Calendar.DAY_OF_YEAR, -1));
+
+        //Month Name + Year
+        gbc.gridy = 0;
+        gbc.gridx++;
+        gbc.weightx = 1;
+        gbc.weighty = 0;  // Shrink to minimum
+        gbc.anchor = GridBagConstraints.CENTER;
+        headerLabel = new JLabel();  //Initialize the label
+        headerPanel.add(headerLabel, gbc);
+        updateHeader();
+
+        //Right arrow
+        gbc.gridy = 0;
+        gbc.gridx++;
+        gbc.weightx = 0;  // Shrink to minimum
+        gbc.weighty = 0;  // Shrink to minimum
+        gbc.anchor = GridBagConstraints.LINE_END;
+        JButton nextMonth = new JButton(" > ");
+        nextMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        headerPanel.add(nextMonth, gbc);
+        nextMonth.addActionListener(e -> selectedDate.add(Calendar.DAY_OF_YEAR, 1));
+
+        //-----------------------------------------------------------
+        //Create month grid panel
+        //-----------------------------------------------------------
+        JPanel gridPanel = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();  //reset gbc
+        //Initialize labels for every grid cell
+        for(int row = 0; row < 24; row++) {
+            //Hour label
+            String hour;
+            if (row == 0) { hour = "12am"; }
+            else if (row < 12) { hour = row + "am"; }
+            else { hour = String.valueOf(row - 12) + "pm"; }
+            JLabel hourLabel = new JLabel(hour);
+            gbc.gridy = row * CELLS_PER_HOUR;
+            gbc.gridx = 0;
+            gbc.gridheight = CELLS_PER_HOUR;
+            gbc.anchor = GridBagConstraints.FIRST_LINE_END;
+            gridPanel.add(hourLabel,gbc);
+
+            //Event label
+            JPanel cellPanel = new JPanel();
+            // second dimension is subdivisions within hour
+            for (int sub = 0; sub < CELLS_PER_HOUR; sub++){
+                labels[row][sub] = new JLabel("_" + sub, SwingConstants.CENTER);
+                cellPanel.add(labels[row][sub]);
+                gbc.gridy = row * CELLS_PER_HOUR + sub;
+                gbc.gridx = 1;
+                gbc.gridheight = 1;
+                gbc.anchor = GridBagConstraints.CENTER;
+                gridPanel.add(cellPanel, gbc);
+            }
+        }
+
+        //Day numbers
+        updateGrid();
+
+        //-----------------------------------------------------------
+        // Add components to DayPanel
+        //-----------------------------------------------------------
+        //Header
+        gbc = new GridBagConstraints();  //Reset everything to default
+        //Add MonthHeader to window
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.weightx = 0;
+        gbc.weighty = .5;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(headerPanel, gbc);
+
+        //Grid
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.weightx = 1;
+        gbc.weighty = .5;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.PAGE_START;
+        this.add(gridPanel, gbc);
+    }
+    /**
+     * Updates the text of the monthLabel to the current month
+     */
+    private void updateHeader(){
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE M/d");
-        JLabel monthLabel = new JLabel(sdf.format(cal.getTime()));
-        this.add(monthLabel, gbc);
+        headerLabel.setText(sdf.format(selectedDate.getTime()));
+    }
+
+    /**
+     * Updates the text of the monthGrid's labels
+     */
+    private void updateGrid(){
     }
 }
 
@@ -95,14 +210,14 @@ class MonthPanel extends JPanel {
         //Get the date (BUT NOT TIME) from the calendar passed in
         displayedMonth = new ObservedCalendar(initialDate);
         displayedMonth.attach(e -> {
-            updateMonthLabel();
+            updateHeaderLabel();
             updateMonthGrid();
         });
 
         //-----------------------------------------------------------
         //Create month label panel
         //-----------------------------------------------------------
-        JPanel monthHeader = new JPanel(new GridBagLayout());
+        JPanel headerPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -116,7 +231,7 @@ class MonthPanel extends JPanel {
         //Trick: By setting a border the button becomes much smaller, and
         //       though we lose the 3d effect we keep the color change on click
         prevMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        monthHeader.add(prevMonth, gbc);
+        headerPanel.add(prevMonth, gbc);
         prevMonth.addActionListener(e -> displayedMonth.add(Calendar.MONTH, -1));
 
         //Month Name + Year
@@ -126,8 +241,8 @@ class MonthPanel extends JPanel {
         gbc.weighty = 0;  // Shrink to minimum
         gbc.anchor = GridBagConstraints.CENTER;
         monthLabel = new JLabel();
-        updateMonthLabel();
-        monthHeader.add(monthLabel, gbc);
+        updateHeaderLabel();
+        headerPanel.add(monthLabel, gbc);
 
         //Right arrow
         gbc.gridy = 0;
@@ -137,7 +252,7 @@ class MonthPanel extends JPanel {
         gbc.anchor = GridBagConstraints.LINE_END;
         JButton nextMonth = new JButton(" > ");
         nextMonth.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        monthHeader.add(nextMonth, gbc);
+        headerPanel.add(nextMonth, gbc);
         nextMonth.addActionListener(e -> displayedMonth.add(Calendar.MONTH, 1));
 
         //-----------------------------------------------------------
@@ -148,6 +263,7 @@ class MonthPanel extends JPanel {
         //Initialize labels for every grid cell
         for(int row = 0; row < ROWS; row++) {
             for(int col = 0; col < COLS; col++) {
+                //todo: Put the label in its own panel and add a little padding to fix calendar stretching slightly when border is added to current date's label
                 // All text centered within labels
                 labels[row][col] = new JLabel(String.valueOf(row*col), SwingConstants.CENTER);
                 monthGrid.add(labels[row][col]);
@@ -169,7 +285,7 @@ class MonthPanel extends JPanel {
         gbc.weighty = 0;  // Shrink to minimum
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
-        this.add(monthHeader, gbc);
+        this.add(headerPanel, gbc);
 
         //Grid
         gbc.gridy = 1;
@@ -183,7 +299,7 @@ class MonthPanel extends JPanel {
     /**
      * Updates the text of the monthLabel to the current month
      */
-    private void updateMonthLabel(){
+    private void updateHeaderLabel(){
         SimpleDateFormat sdf = new SimpleDateFormat("MMMMM yyyy");
         monthLabel.setText(sdf.format(displayedMonth.getTime()));
     }
